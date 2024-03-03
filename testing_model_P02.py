@@ -6,7 +6,8 @@
 # this file is dedicated to testing the model created in file: model_P02.py
 
 #importing neccessary libraries
-import model_P01
+import model_P02
+from model_P02 import test, predictors
 import pandas
 import sklearn
 from joblib import load
