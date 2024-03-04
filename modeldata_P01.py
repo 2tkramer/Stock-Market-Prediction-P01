@@ -1,5 +1,5 @@
 
-# File: model_P02
+# File: modeldata_P01
 # Author: Taylor Kramer
 # Date: 03/02/24
 
@@ -12,7 +12,8 @@
 pandas dataframe. From here, the ticker function only grabs the S&P 500 
 data (GSPC). Then the history function asks to import all historical data.'''
 
-import yfinance as yf 
+from modelClass import Model
+import yfinance as yf
 from sklearn.ensemble import RandomForestClassifier
 from joblib import dump
 
@@ -51,21 +52,26 @@ sp500["Target"] = sp500.apply(up_or_down, axis=1)
 
 '''why random forests: resistant to overfitting, run relatively quickly, and can 
 pick up nonlinear tendencies in the data.
-Starts by initializing the model. 
+Starts by initializing the model using RFCmodel function in Model class. 
 Keeping in mind that this is time series data, only the last 100 rows of data 
 will be used for the test set while all prior data is used in the training set
 Next, the predictors are choosen out of the available features
-Lastly, the model is trained on the train dataset'''
+function returns initialized model along with definitions for train & test sets
+Lastly, the model is trained on the train dataset.'''
 
-model = RandomForestClassifier(n_estimators=100, min_samples_split=100, random_state=1)
-train = sp500.iloc[:-100]
-test = sp500.iloc[-100:]
+#example creating a starting_model using Model Class to initialize
+starting = Model()
+starting_model = starting.RFCmodel()
+db_size = sp500.shape[0]
+st_train, st_test = starting.Get_Train_Test(sp500, 0, db_size-100, db_size-100, db_size)
+#print(st_train.info())
+#print(st_test.info())
 
-predictors = ["Open", "High", "Low", "Close", "Volume"]
-model.fit(train[predictors], train["Target"])
+#training starting_model
+starting_model.fit(st_train[starting.predictors], st_train["Target"])
 
 #for accessing the model from other files
-dump(model, 'saved_model.joblib')
+dump(starting_model, 'saved_model.joblib')
 
-#--------model is complete, refer to testing_model_P02 for testing results
+#--------starting_model is complete, refer to testing_model_P01 for model improvement
 
