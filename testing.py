@@ -8,8 +8,8 @@
 #%%
 
 #importing neccessary libraries
-from modelClass import Model
-from modeldata_P01 import sp500, st_test
+from model import Model
+from data import sp500, st_test
 import pandas as pd
 from joblib import load
 from sklearn.ensemble import RandomForestClassifier
