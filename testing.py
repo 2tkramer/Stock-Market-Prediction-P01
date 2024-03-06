@@ -1,15 +1,15 @@
 
-# File: testing_model_P01
+# File: testing
 # Author: Taylor Kramer
 # Date: 03/02/24
 
-# this file is dedicated to testing the model created in file: model_P02.py
+# everything involving the testing of desired model
 
 #%%
 
 #importing neccessary libraries
+from data import Data
 from model import Model
-from data import sp500, st_test
 import pandas as pd
 from joblib import load
 from sklearn.ensemble import RandomForestClassifier
@@ -25,17 +25,19 @@ saved_trained_model = load('saved_model.joblib')
 Utilize sklearn's precision_score function to determine what percentage of the time 
 the model correctly predicts what direction the market will go.'''
 
-testing_model = Model(sp500)
-t_predictions = saved_trained_model.predict(st_test[testing_model.predictors])
+#testing_model = Model(sp500)
+#t_predictions = saved_trained_model.predict(st_test[testing_model.predictors])
 #print(t_predictions)
-test_score = precision_score(st_test["Target"], t_predictions)
+#test_score = precision_score(st_test["Target"], t_predictions)
 #print(test_score)
 
 '''Begin Backtesting'''
+calldata = Data("^GSPC") #initiates instance of Data class to import raw data
+calldata.clean_data() #wrangles data
+sp500 = calldata.get_data()
 
-backtesting = Model(sp500)
-bt_model = backtesting.RFCmodel()
-bt_predictions = backtesting.backtest(bt_model)
+backtesting = Model(sp500, "RFC")
+bt_predictions = backtesting.backtest()
 print(bt_predictions)
 print(bt_predictions["Predictions"].value_counts())
 bt_score = precision_score(bt_predictions["Target"], bt_predictions["Predictions"])

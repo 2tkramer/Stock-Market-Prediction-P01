@@ -1,13 +1,46 @@
+
+# File: model
+# Author: Taylor Kramer
+# Date: 03/02/24
+
+# everything involving the creation and manipulation of desired ML model
+
 from sklearn.ensemble import RandomForestClassifier
 import pandas as pd
+pd.options.mode.chained_assignment = None  # default='warn'
 
 class Model:
     
-    def __init__(self, data):
+    def __init__(self, data, modeltype):
         self.predictors = ["Open", "High", "Low", "Close", "Volume"]
         self.data = data
+        self.model = self.initialize_model(modeltype)
     
-    def Get_Train_Test(self, a, b, c, d):
+    #TODO: print and plot data functions
+    
+    def initialize_model(self, modeltype):
+        
+        "intializes model based on the user's preferences"
+        
+        '''Why random forests: resistant to overfitting, run relatively quickly, and can 
+        pick up nonlinear tendencies in the data.
+        This function initializes a Random Forest Classifier Model.'''
+        if modeltype == "RFC":
+            return RandomForestClassifier(n_estimators=100, min_samples_split=100, random_state=1)
+        
+        '''TODO: Why ANN: Why KNN: Why LSTM:'''
+    
+    #TODO: fix function
+    def train_model(self, trainx, trainy):
+        
+        if trainx == None and trainy == None:
+            trainx, trainy = self.get_train_test(0, self.data.shape[0]-100, self.data.shape[0]-100, self.data.shape[0])
+            print(trainx.info())
+            print(trainy.info())
+        
+        self.model.fit(trainx[self.predictors], trainy["Target"])
+    
+    def get_train_test(self, a, b, c, d):
         
         ''' Creates training and testing datasets from self.data using the inputs which
         define the starting and ending row for the train set and the starting and ending 
@@ -16,31 +49,21 @@ class Model:
         train = self.data.iloc[a:b]
         test = self.data.iloc[c:d]
         return train, test
-        
-    def RFCmodel(self):
-        
-        '''Why random forests: resistant to overfitting, run relatively quickly, and can 
-        pick up nonlinear tendencies in the data.
-        This function initializes a Random Forest Classifier Model.'''
-        
-        model = RandomForestClassifier(n_estimators=100, min_samples_split=100, random_state=1)
-        return model
 
-    def predict(self, train, test, model):
+    def predict(self, train, test):
         
         '''predict: trains the model, uses the model to make predictions (these
         predictions are placed into a pandas Series for compatability), ensuring 
         that the indexes are consistent. Then the model predictions are concatenated with 
         the actual outcomes in the data and then this may be used for teting and 
         visualization of model effectiveness.'''
-        
-        model.fit(train[self.predictors], train["Target"])
-        predictions = model.predict(test[self.predictors])
+        self.train_model(train[self.predictors], train["Target"])
+        predictions = self.model.predict(test[self.predictors])
         predictions_Series = pd.Series(predictions, index = test.index, name="Predictions")
         combined = pd.concat([test["Target"], predictions_Series],axis=1)
         return combined
     
-    def backtest(self, model, start=2500, step=250):
+    def backtest(self, start=2500, step=250):
         
         '''backtest: takes in desired data, the machine learning model, the predictors as
         well as the starting number of days worth of data to train the model on. Given there 
@@ -51,8 +74,8 @@ class Model:
         all_predictions = []
     
         for i in range(start, self.data.shape[0], step):
-            train, test = self.Get_Train_Test(0, i, i, i+step)
-            predictions = self.predict(train, test, model)
+            train, test = self.get_train_test(0, i, i, i+step)
+            predictions = self.predict(train, test)
             all_predictions.append(predictions)
         return pd.concat(all_predictions)
     
