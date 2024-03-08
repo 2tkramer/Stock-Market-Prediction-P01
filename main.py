@@ -12,10 +12,10 @@ from model import Model
 import pandas as pd
 from testing import Testing
 from joblib import dump # for pickling model
-
+from sklearn.metrics import precision_score
 
 def main():
-   #TODO: create an interaction class to place main content
+   #TODO: create an interaction class to place current main content
    repeat = 'yes'
 
    while repeat == 'yes':
@@ -26,10 +26,11 @@ def main():
       print("Here are some examples: ^GSPC (S&P 500), ^DJI (Dow Jones), AAPL (Apple), TSLA (Tesla)\n")
       ticker = input("Your choice: ")
       "TODO: import list of all options, and reprompt if choice doesn't exist, have the reprompt give tips and suggestions"
-      calldata = Data(ticker) #initiates instance of Data class -> imports raw data
-      calldata.clean_data() #wrangles data
-      mydata = calldata.get_data() #places cleaned data into variable: mydata
+      mydata = Data(ticker) #initiates instance of Data class -> imports raw data
+      mydata.clean_data() #wrangles data
+      outputdata = mydata.get_data() #places cleaned data into variable: mydata
       #TODO: create visualizations for dataset, create visualization class
+      #outputdata.plot.line(y="Close", use_index=True)
          
       #--------Model----------------------------------------------------------------------------------
       
@@ -38,18 +39,24 @@ def main():
       modeltype = input("Your choice: ")
       "TODO: reprompt if choice doesn't exist, have the reprompt give tips"
       print("\nAwesome! I am initializing and training your model on your chosen dataset now...\n")
-      mymodel = Model(calldata, modeltype) #initiates instance of Model class -> initializes model
-      mymodel.train_model(calldata, pd.DataFrame(), pd.DataFrame()) #trains base model
+      mymodel = Model(modeltype) #initiates instance of Model class -> initializes model w/ basic parameters TODO: ask about updating parameters later
+      mymodel.train_model(mydata, pd.DataFrame(), pd.DataFrame()) #trains base model, 
       #TODO: create visualizations for the initial trained model
+      #precision result
       print("\n All Done! Now time to do a little bit of testing.")
       
       #--------Testing & Improvement------------------------------------------------------------------
 
       print("\nFirst, let's do some backtesting... starting now...")
+      backtesting = Testing()
+      bt_predictions = backtesting.backtest(mymodel, mydata, 0.5)
+      bt_score = precision_score(bt_predictions["Target"], bt_predictions["Predictions"])
+      print(bt_score) 
+      print(bt_predictions["Target"].value_counts()/bt_predictions.shape[0])
       
-      # back testing model
-      # providing results
       # improving model
+      horizons = [2,5,60,250,1000]
+      backtesting = mydata.add_trends(mymodel, horizons)
       # testing again
       # providing results
 

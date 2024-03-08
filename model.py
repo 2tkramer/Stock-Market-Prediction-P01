@@ -12,14 +12,13 @@ pd.options.mode.chained_assignment = None  # default='warn'
 
 class Model:
     
-    def __init__(self, dataclass, modeltype):
+    def __init__(self, modeltype):
         self.predictors = ["Open", "High", "Low", "Close", "Volume"]
-        self.data = dataclass.data
-        self.model = self.initialize_model(modeltype)
+        self.model = self.initialize_model(modeltype, 100, 100, 1)
     
     #TODO: print and plot data functions
     
-    def initialize_model(self, modeltype):
+    def initialize_model(self, modeltype, a, b, c):
         
         "intializes model based on the user's preferences"
         
@@ -27,15 +26,13 @@ class Model:
         pick up nonlinear tendencies in the data.
         This function initializes a Random Forest Classifier Model.'''
         if modeltype == "RFC":
-            return RandomForestClassifier(n_estimators=100, min_samples_split=100, random_state=1)
+            return RandomForestClassifier(n_estimators=a, min_samples_split=b, random_state=c)
         
         '''TODO: Why ANN: Why KNN: Why LSTM:'''
     
     def train_model(self, dataclass, trainx, trainy):
         if trainx.empty == True and trainy.empty == True:
             traindata, testdata = dataclass.get_train_test(0, dataclass.data.shape[0]-100, dataclass.data.shape[0]-100, dataclass.data.shape[0])
-            print(traindata.info())
-            print(traindata.info())
             self.model.fit(traindata[self.predictors], traindata["Target"])
         else:
             self.model.fit(trainx, trainy)

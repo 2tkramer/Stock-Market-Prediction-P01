@@ -70,27 +70,28 @@ class Data:
         self.data["Target"] = self.data.apply(up_or_down, axis=1)
         self.data = self.data.dropna()
         
-        def horizons(self, horizons):
-        
-            '''horizons: adding more columns/predictors based on trends for the model to make better predictions.
-            The for loop iterates through horizons, an array which holds numbers that represent number 
-            of past days (num). For each iteration, the average closing price for the last "num" days is 
-            calculated. Then a new column of data is created "Close_Ratio_num" which creates a relationship 
-            between the closing price of the present day and the avg price of the past "num" days. Each 
-            iteration also creates a "Trend_num" column which contains the sum of days in the last "num" 
-            of days where the stock market went up, helping detect a trend in the market. This finally adds 
-            the two new columns to the predictors array through each iteration.'''
-       
-            for num in horizons:
-                rolling_averages = self.data.rolling(num).mean()
-                ratio_column = f"Close_Ratio_{num}"
-                self.data[ratio_column] = self.data["Close"] / rolling_averages["Close"] 
-                trend_column = f"Trend_{num}" 
-                self.data[trend_column] = self.data.shift(1).rolling(num).sum()["Target"]
-                self.predictors += [ratio_column, trend_column]
-                self.data = self.data.dropna()
-            return
-        
+    def add_trends(self, modelclass, pastdays):
+    
+        '''horizons: adding more columns/predictors based on trends for the model to make 
+        better predictions. The for loop iterates through horizons, an array which holds 
+        numbers that represent number of past days (num). For each iteration, the average 
+        closing price for the last "num" days is calculatede. Then a new column of data is 
+        created "Close_Ratio_num" which creates a relationship between the closing price 
+        of the present day and the avg price of the past "num" days. Each iteration also 
+        creates a "Trend_num" column which contains the sum of days in the last "num" of 
+        days where the stock market went up, helping detect a trend in the market. This 
+        finally adds the two new columns to the predictors array through each iteration.'''
+    
+        for num in pastdays:
+            rolling_averages = self.data.rolling(num).mean()
+            ratio_column = f"Clos_Ratio_{num}"
+            self.data[ratio_column] = self.data["Close"] / rolling_averages["Close"] 
+            trend_column = f"Trend_{num}" 
+            self.data[trend_column] = self.data.shift(1).rolling(num).sum()["Target"]
+            modelclass.predictors += [ratio_column, trend_column]
+            self.data = self.data.dropna()
+        return
+    
 
 
 
