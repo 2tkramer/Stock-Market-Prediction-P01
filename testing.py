@@ -15,7 +15,9 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import precision_score
 
 class Testing:
+    
     def __init__(self):
+        # here if needed
         return
 
     def model_prec_score(self, dataclass, modelclass):
@@ -36,9 +38,14 @@ class Testing:
         that the indexes are consistent. Then the model predictions are concatenated with 
         the actual outcomes in the data and then this may be used for teting and 
         visualization of model effectiveness. TODO: explain confidence & predict_proba'''
+
+        if modelclass.new_predictors == []:
+            predictors = modelclass.predictors
+        else:
+            predictors = modelclass.new_predictors
         
-        modelclass.train_model(dataclass, train[modelclass.predictors], train["Target"])
-        preds = modelclass.model.predict_proba(test[modelclass.predictors])[:,1]
+        modelclass.train_model(dataclass, train[predictors], train["Target"])
+        preds = modelclass.model.predict_proba(test[predictors])[:,1]
         for i in range(len(preds)):
             if preds[i] >= confidence:
                 preds[i] = 1
@@ -84,7 +91,7 @@ mydata.add_trends(mymodel, pastdays)
 #print(mydata.data.info())
 #improving model
 new_model = mymodel.initialize_model("RFC", 200, 50, 1)
-new_predictions = backtesting.backtest(mymodel, mydata, 0.6) #TODO: figure out why precision score is lower
+new_predictions = backtesting.backtest(mymodel, mydata, 0.6)
 print(new_predictions["Predictions"].value_counts())
 print("prec score improved: ", precision_score(new_predictions["Target"], new_predictions["Predictions"]))
 

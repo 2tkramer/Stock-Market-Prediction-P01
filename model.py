@@ -14,6 +14,7 @@ class Model:
     
     def __init__(self, modeltype):
         self.predictors = ["Open", "High", "Low", "Close", "Volume"]
+        self.new_predictors = []
         self.model = self.initialize_model(modeltype, 100, 100, 1)
     
     #TODO: print and plot data functions

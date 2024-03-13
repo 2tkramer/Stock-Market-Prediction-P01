@@ -81,7 +81,7 @@ class Data:
         creates a "Trend_num" column which contains the sum of days in the last "num" of 
         days where the stock market went up, helping detect a trend in the market. This 
         finally adds the two new columns to the predictors array through each iteration.'''
-    
+        
         for num in pastdays:
             rolling_averages = self.data.rolling(num).mean()
             ratio_column = f"Clos_Ratio_{num}"
@@ -90,6 +90,7 @@ class Data:
             self.data[trend_column] = self.data.shift(1).rolling(num).sum()["Target"]
             modelclass.predictors += [ratio_column, trend_column]
             self.data = self.data.dropna()
+            modelclass.new_predictors += [ratio_column, trend_column]
         return
     
 
