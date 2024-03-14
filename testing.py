@@ -5,8 +5,6 @@
 
 # Class testing includes everything related to testing desired model
 
-#%%
-
 #importing neccessary libraries
 from data import Data
 from model import Model
@@ -69,40 +67,3 @@ class Testing:
             preds = self.predict(modelclass, dataclass, train, test, confidence)
             all_preds.append(preds)
         return pd.concat(all_preds)
-    
-    
-'''Begin Backtesting'''
-mydata = Data("^GSPC") #initiates instance of Data class to import raw data
-mydata.clean_data() #wrangles data
-outputdata = mydata.get_data()
-
-mymodel = Model("RFC")
-mymodel.train_model(mydata, pd.DataFrame(), pd.DataFrame())
-
-backtesting = Testing()
-
-bt_predictions = backtesting.backtest(mymodel, mydata, 0.5)
-bt_score = precision_score(bt_predictions["Target"], bt_predictions["Predictions"])
-print("prec score original: ", bt_score) 
-print(bt_predictions["Target"].value_counts()/bt_predictions.shape[0])
-
-pastdays = [2,5,60,250,1000]
-mydata.add_trends(mymodel, pastdays)
-#print(mydata.data.info())
-#improving model
-new_model = mymodel.initialize_model("RFC", 200, 50, 1)
-new_predictions = backtesting.backtest(mymodel, mydata, 0.6)
-print(new_predictions["Predictions"].value_counts())
-print("prec score improved: ", precision_score(new_predictions["Target"], new_predictions["Predictions"]))
-
-#--------Visualizing Outcomes-----------------------------------------------------
-
-'''Starts by placing predictions into a pandas Series for compatibility, ensuring 
-that the indexes are consistent. Then the model predictions are concatenated with 
-the actual outcomes as seen in the data and then this may be plotted to visualize 
-the effectiveness of the model.'''
-
-
-#combined.plot()
-
-# %%

@@ -11,8 +11,13 @@ from interact import Interact
 
 def main():
    
+   '''Creates instance of the interact class which is the class responsible for running and
+   interacting with all other classes within the program. Begins running the program by
+   calling the function that runs the user interface.'''
+   
    myjourney = Interact()
-   myjourney.main_program()
+   myjourney.user_interface()
+   
    return
 
 if __name__ == "__main__":
